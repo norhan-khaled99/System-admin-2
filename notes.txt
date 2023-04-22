@@ -1,0 +1,172 @@
+----------------today topics
+
+---Local Repo
+
+---Remote Repo (FTP protocol)
+
+---DNF Modules
+
+---LAB
+
+---Boot Process, systemd and services , root password reset
+
+-----------------------******************************************----------------------------------------
+
+----------------------------------------------------local repo 
+
+---steps : 
+
+1- first step mount DVD
+
+	mount /dev/sr0 /mnt
+
+	note : to make sure that it's insatlled
+	
+			--cd /mnt 
+
+			--ls
+			
+			--must be file called AppStream and inside it Packages 
+
+2- copy the content of the packages --> /localrepo/
+
+	mkdir /localrepo
+
+	cp -rv /mnt/Appstream/Packages/* /localrepo
+
+3- change permissions for all packages over directory
+
+	chmod -R 775 /localrepo
+
+4- create database of the metadata of the packages
+
+	dnf install createrepo
+
+	createrepo --database /localrepo/
+
+	note : to make sure ... cd /localrepo/repodata 
+
+					  ls .... must be file called repomd.xml
+
+5- configuration via package managment tool on the machine
+
+	yum-config-manager
+
+	yum-config-manager --add-repo file:///localrepo/
+
+	cat /etc/yum.repos.d/localrepo_.repo
+
+	echo "gpcheck=0" >> /etc/yom.repos.d/localrepo_.repo
+
+	cat /etc/yum.repos.d/localrepo_.repo // now gpcheck added to the file
+
+6- test the new repo
+
+	dnf repolist     ///localrepo_ added to repolist
+	
+	yum-config-manager --disable appstream
+
+	yum-config-manager --disable baseos
+
+	yum-config-manager --disable extras-common
+
+	dnf install bind
+
+-----------------------******************************************----------------------------------------
+
+----------------------------------------------------Remote repo 
+
+----- Centos Steps :
+
+1- install and configure FTP SERVER   OR   (HTTP)
+
+	dnf install vsftpd       			 /////// (dnf install httpd)
+
+	vim /etc/vsftpd/vsftpd.conf	 	
+
+	change to anonymous_enable = YES
+
+
+2- copy content from DVD to remote FTP SERVER
+
+	copy -rv /mnt/AppStream/Packages/* /var/ftp/pub/.   /////   (copy -rv /mnt/AppStream/Packages/* /var/www/html/.)
+
+	chmod -R 777 /var/ftp/pub
+
+3- create repo database
+	
+	createrepo --database /var/ftp/pub/
+
+4- start FTP Service and Check 
+	
+	systemctl --now enable vsftpd
+
+	systemctl status vsftpd          //////// active(running)
+
+5- disable Firewall and SElinux
+
+	systemctl stop firewalld
+	
+	setenforce 0
+
+----- Rocky8 machine Steps :
+
+
+1- install yum utils and ftp
+
+	dnf install yum-utils ftp	
+
+2- create yum configuration
+
+	ftp 192.168.10.133        /////anonymous
+
+	ls 
+
+	cd /pub
+
+	exit
+
+	yum-config-manager --add-repo ftp://192.168.10.133/pub/
+
+3- add gpgcheck to the configuration
+
+	ls /etc/yum.repo.d/
+
+	cat /etc/yum.repos.d/192.168.10.133/pub/
+	
+	echo "gpcheck=0" >> /etc/yom.repos.d/192.168.10.133_pub_.repo
+
+4- list repodata
+
+	dnf repolist
+
+	dnf repoinfo 192.168.10.133_pub_
+
+-----------------------******************************************----------------------------------------
+
+------------------------------------------------------------modules
+
+	dnf module list | grep php
+
+	dnf module install php:7.4/devel
+
+	php -v
+
+	dnf module remove php	
+
+-----------------------******************************************----------------------------------------
+
+------------------------------------------------------------Boot
+
+
+
+
+
+
+
+
+
+
+
+
+
